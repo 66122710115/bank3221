@@ -2,281 +2,268 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <title>PTT - Procurement</title>
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PTT ERP - Inventory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      display: flex; min-height: 100vh;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px; background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px); padding: 20px;
+      display: flex; flex-direction: column; gap: 20px;
+      box-shadow: 2px 0 15px rgba(0,0,0,0.3);
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+    .sidebar h2 {
+      font-size: 1.3rem; text-align: center; font-weight: 600;
+    }
+    .sidebar nav {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .sidebar nav a {
+      text-decoration: none; padding: 12px 15px;
+      border-radius: 12px; font-weight: 500;
+      color: #fff; transition: 0.3s;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      background: rgba(255,255,255,0.3); color: #000; font-weight: 600;
+    }
+
+    /* Main */
+    .main { flex: 1; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 1.6rem; text-shadow: 2px 2px 5px rgba(0,0,0,0.4); }
+
+    .btn {
+      background: #ffd369; color: #000; padding: 10px 18px;
+      border-radius: 12px; font-weight: 600; text-decoration: none;
+      transition: 0.3s;
+    }
+    .btn:hover { background: #ffb703; }
+
+    /* Card */
+    .card-container {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px; margin-top: 10px;
+    }
+    .card {
+      background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+      border-radius: 20px; padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+    .card h3 { font-size: 1.1rem; margin-bottom: 10px; }
+    .card .value { font-size: 1.4rem; font-weight: 600; color: #ffd369; }
+
+    /* Table */
+    .table-section {
+      margin-top: 20px; background: rgba(255,255,255,0.12);
+      padding: 20px; border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .table-section h2 { margin-bottom: 15px; }
+    table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; }
+    table thead { background: rgba(255,255,255,0.2); }
+    table th, table td { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    table tbody tr:hover { background: rgba(255,255,255,0.1); }
+
+    .delete-btn {
+      background: #ff4d4d; color: #fff; border: none;
+      padding: 6px 12px; border-radius: 8px; cursor: pointer;
+      transition: 0.3s;
+    }
+    .delete-btn:hover { background: #e60000; }
+
+    /* Status badge */
+    .status { padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; }
+    .ok { background: #28a745; }
+    .warn { background: #ffc107; color: #000; }
+    .danger { background: #dc3545; }
+    .pending { background: #17a2b8; }
+  </style>
 </head>
-<style>
-  /* ปรับ modal ให้แสดงตรงกลาง */
-  #createModal,
-  #receiptModal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    width: 90%;
-    max-width: 500px;
-  }
-
-  #createModal.active,
-  #receiptModal.active {
-    display: block;
-  }
-
-  #createModal h3,
-  #receiptModal h3 {
-    margin-top: 0;
-    font-size: 18px;
-  }
-
-  #createModal input,
-  #receiptModal input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-
-  #createModal button,
-  #receiptModal button {
-    margin-right: 10px;
-  }
-
-  .btn {
-    background-color: #0066cc;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s ease-in-out;
-  }
-
-  .btn:hover {
-    background-color: #004999;
-  }
-
-  /* สถานะ */
-  .approved {
-    color: green;
-    font-weight: bold;
-  }
-
-  .rejected {
-    color: red;
-    font-weight: bold;
-  }
-
-  /* ตาราง */
-  table button {
-    padding: 4px 8px;
-    margin: 0 2px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  table th,
-  table td {
-    text-align: center;
-  }
-</style>
 <body>
-  <div class="sidebar">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
     <h2>PTT ERP</h2>
     <nav>
-      <a href="index.html">Home</a>
-      <a href="financials.html">Financials</a>
-      <a href="procurement.html">Inventory</a>
-      <a href="report.html">Report</a>
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="financials.html"><i class="fa-solid fa-coins"></i> Financials</a>
+      <a href="procurement.html" class="active"><i class="fa-solid fa-box"></i> Inventory</a>
+      <a href="report.html"><i class="fa-solid fa-chart-line"></i> Report</a>
     </nav>
-  </div>
+  </aside>
 
+  <!-- Main content -->
   <div class="main">
     <div class="header">
-      <h1> การจัดการสินค้าคงคลัง (Inventory Management)</h1>
-      <div>
-        <button class="btn" onclick="openCreateModal()">+ สร้างรายการ</button>
-      </div>
+      <h1>การจัดการสินค้าคงคลัง (Inventory Management)</h1>
+      <a href="#" class="btn">+ เพิ่มสินค้า</a>
     </div>
 
+    <!-- Summary -->
     <div class="card-container">
       <div class="card">
-        <h3>Orders This Month</h3>
-        <div class="value">฿ 5,200,000</div>
+        <h3>มูลค่ารวมสินค้าคงคลัง</h3>
+        <div class="value" id="totalValue">฿147,500,000</div>
       </div>
       <div class="card">
-        <h3>Vendors</h3>
-        <div class="value">45 ราย</div>
+        <h3>จำนวนรายการสินค้า</h3>
+        <div class="value" id="totalItems">4 รายการ</div>
       </div>
     </div>
 
+    <!-- Stock Table -->
     <div class="table-section">
-      <h2>รายการล่าสุด</h2>
+      <h2><i class="fa-solid fa-boxes-stacked"></i> สินค้าคงเหลือ</h2>
       <table>
         <thead>
           <tr>
-            <th>รายการเลขที่ใบเสร็จ</th>
-            <th>ผู้ขาย</th>
-            <th>รายการสินค้า</th>
-            <th>วันที่</th>
-            <th>จำนวน(บาท)</th>
+            <th>สินค้า</th>
+            <th>ประเภท</th>
+            <th>จำนวนคงเหลือ</th>
+            <th>หน่วย</th>
+            <th>มูลค่าประมาณ (บาท)</th>
             <th>สถานะ</th>
-            <th>อนุมัติ</th>
+            <th>จัดการ</th>
           </tr>
         </thead>
-        <tbody id="poTableBody">
-          <!-- รายการจะมาแสดงตรงนี้ -->
+        <tbody>
+          <tr>
+            <td>น้ำมันดิบ</td>
+            <td>พลังงาน</td>
+            <td>50,000</td>
+            <td>บาร์เรล</td>
+            <td>฿80,000,000</td>
+            <td><span class="status ok">เพียงพอ</span></td>
+            <td><button class="delete-btn">ลบ</button></td>
+          </tr>
+          <tr>
+            <td>ก๊าซธรรมชาติ</td>
+            <td>พลังงาน</td>
+            <td>25,000</td>
+            <td>ตัน</td>
+            <td>฿50,000,000</td>
+            <td><span class="status ok">เพียงพอ</span></td>
+            <td><button class="delete-btn">ลบ</button></td>
+          </tr>
+          <tr>
+            <td>สารเคมี</td>
+            <td>วัตถุดิบ</td>
+            <td>12,500</td>
+            <td>กิโลกรัม</td>
+            <td>฿12,500,000</td>
+            <td><span class="status warn">ใกล้หมด</span></td>
+            <td><button class="delete-btn">ลบ</button></td>
+          </tr>
+          <tr>
+            <td>อุปกรณ์โรงกลั่น</td>
+            <td>อุตสาหกรรม</td>
+            <td>150</td>
+            <td>ชิ้น</td>
+            <td>฿5,000,000</td>
+            <td><span class="status danger">ต่ำกว่ากำหนด</span></td>
+            <td><button class="delete-btn">ลบ</button></td>
+          </tr>
         </tbody>
       </table>
     </div>
-
-    <!-- ใบเสร็จ -->
-    <div id="receiptModal">
-      <h3>ใบเสร็จ</h3>
-      <p id="receiptContent">...</p>
-      <button onclick="closeModal()">ปิด</button>
-    </div>
-
-    <!-- ฟอร์มสร้างรายการ -->
-    <div id="createModal">
-      <h3>สร้างรายการสินค้า</h3>
-      <input type="text" id="poNo" placeholder="PO No.">
-      <input type="text" id="vendor" placeholder="Vendor">
-      <input type="text" id="item" placeholder="Item">
-      <input type="date" id="date">
-      <input type="number" id="amount" placeholder="Amount">
-      <button class="btn" onclick="addPO()">เพิ่ม</button>
-      <button class="btn" onclick="closeCreateModal()">ยกเลิก</button>
-    </div>
   </div>
 
-<script>
-  let poList = [];
+  <!-- Script -->
+  <script>
+    const btnAdd = document.querySelector('.btn');
+    const tbody = document.querySelector('table tbody');
+    const totalValueEl = document.getElementById('totalValue');
+    const totalItemsEl = document.getElementById('totalItems');
 
-  // โหลดข้อมูลจาก localStorage ตอนเปิดหน้า
-  window.onload = function () {
-    const saved = localStorage.getItem("poList");
-    if (saved) {
-      poList = JSON.parse(saved);
-      poList.forEach(addPOToTable);
-    }
-  };
-
-  function saveToLocalStorage() {
-    localStorage.setItem("poList", JSON.stringify(poList));
-  }
-
-  function addPO() {
-    const poNo = document.getElementById("poNo").value;
-    const vendor = document.getElementById("vendor").value;
-    const item = document.getElementById("item").value;
-    const date = document.getElementById("date").value;
-    const amount = document.getElementById("amount").value;
-
-    if (!poNo || !vendor || !item || !date || !amount) {
-      alert("กรุณากรอกข้อมูลให้ครบ");
-      return;
+    function updateSummary() {
+      let rows = tbody.querySelectorAll('tr');
+      let total = 0;
+      rows.forEach(row => {
+        const valueText = row.cells[4].innerText.replace(/[฿,]/g,'');
+        total += parseFloat(valueText) || 0;
+      });
+      totalValueEl.innerText = "฿" + total.toLocaleString();
+      totalItemsEl.innerText = rows.length + " รายการ";
     }
 
-    const newPO = {
-      poNo,
-      vendor,
-      item,
-      date,
-      amount,
-      status: "pending"
-    };
-
-    poList.push(newPO);
-    saveToLocalStorage();
-    addPOToTable(newPO);
-    closeCreateModal();
-  }
-
-  function addPOToTable(po) {
-    const tbody = document.getElementById("poTableBody");
-
-    const tr = document.createElement("tr");
-    tr.id = "row-" + po.poNo;
-    tr.innerHTML = `
-      <td>${po.poNo}</td>
-      <td>${po.vendor}</td>
-      <td>${po.item}</td>
-      <td>${po.date}</td>
-      <td>฿ ${parseFloat(po.amount).toLocaleString()}</td>
-      <td id="status-${po.poNo}" class="${po.status === 'approved' ? 'approved' : po.status === 'rejected' ? 'rejected' : ''}">
-        ${po.status === 'approved' ? '✅ อนุมัติแล้ว' : po.status === 'rejected' ? '❌ ไม่อนุมัติ' : 'ยังไม่อนุมัติ'}
-      </td>
-      <td>
-        <button onclick="approveItem('${po.poNo}')">✔️</button>
-        <button onclick="rejectItem('${po.poNo}')">❌</button>
-        <button onclick="createReceipt('${po.poNo}')" id="receipt-${po.poNo}" ${po.status === 'approved' ? '' : 'disabled'}>ใบเสร็จ</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  }
-
-  function approveItem(poId) {
-    const po = poList.find(p => p.poNo === poId);
-    if (po) {
-      po.status = "approved";
-      saveToLocalStorage();
-      document.getElementById('status-' + poId).textContent = '✅ อนุมัติแล้ว';
-      document.getElementById('status-' + poId).className = 'approved';
-      document.getElementById('receipt-' + poId).disabled = false;
+    function attachDeleteEvent(button) {
+      button.addEventListener('click', function() {
+        if (confirm('ต้องการลบสินค้านี้หรือไม่?')) {
+          const row = button.closest('tr');
+          row.remove();
+          updateSummary();
+        }
+      });
     }
-  }
+    document.querySelectorAll('.delete-btn').forEach(attachDeleteEvent);
 
-  function rejectItem(poId) {
-    const po = poList.find(p => p.poNo === poId);
-    if (po) {
-      po.status = "rejected";
-      saveToLocalStorage();
-      document.getElementById('status-' + poId).textContent = '❌ ไม่อนุมัติ';
-      document.getElementById('status-' + poId).className = 'rejected';
-      document.getElementById('receipt-' + poId).disabled = true;
-    }
-  }
+    btnAdd.addEventListener('click', function(e) {
+      e.preventDefault();
+      if(document.querySelector('#addForm')) return;
 
-  function createReceipt(poId) {
-    const po = poList.find(p => p.poNo === poId);
-    if (po) {
-      const content = `
-        <strong>ใบเสร็จ</strong><br/>
-        เลขที่คำสั่งซื้อ: ${po.poNo}<br/>
-        ผู้ขาย: ${po.vendor}<br/>
-        สินค้า: ${po.item}<br/>
-        วันที่: ${po.date}<br/>
-        จำนวนเงิน: ฿ ${parseFloat(po.amount).toLocaleString()}<br/>
-        สถานะ: ชำระแล้ว
+      const form = document.createElement('tr');
+      form.id = 'addForm';
+      form.innerHTML = `
+        <td><input type="text" placeholder="สินค้า" required></td>
+        <td><input type="text" placeholder="ประเภท" required></td>
+        <td><input type="number" placeholder="จำนวน" required></td>
+        <td><input type="text" placeholder="หน่วย" required></td>
+        <td><input type="number" placeholder="มูลค่า (บาท)" required></td>
+        <td><span class="status pending">รอประเมิน</span></td>
+        <td>
+          <button id="saveBtn">บันทึก</button>
+          <button id="cancelBtn">ยกเลิก</button>
+        </td>
       `;
-      document.getElementById("receiptContent").innerHTML = content;
-      document.getElementById("receiptModal").classList.add("active");
-    }
-  }
+      tbody.prepend(form);
 
-  function closeModal() {
-    document.getElementById("receiptModal").classList.remove("active");
-  }
+      document.getElementById('saveBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        const inputs = form.querySelectorAll('input');
+        const [product, type, qty, unit, value] = Array.from(inputs).map(i => i.value.trim());
+        if (!product || !type || !qty || !unit || !value) {
+          alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+          return;
+        }
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td>${product}</td>
+          <td>${type}</td>
+          <td>${parseInt(qty).toLocaleString()}</td>
+          <td>${unit}</td>
+          <td>฿${parseFloat(value).toLocaleString()}</td>
+          <td><span class="status pending">รอประเมิน</span></td>
+          <td><button class="delete-btn">ลบ</button></td>
+        `;
+        form.remove();
+        tbody.prepend(newRow);
+        attachDeleteEvent(newRow.querySelector('.delete-btn'));
+        updateSummary();
+      });
 
-  function openCreateModal() {
-    document.getElementById("createModal").classList.add("active");
-  }
-
-  function closeCreateModal() {
-    document.getElementById("createModal").classList.remove("active");
-  }
-</script>
+      document.getElementById('cancelBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        form.remove();
+      });
+    });
+  </script>
 
 </body>
 </html>

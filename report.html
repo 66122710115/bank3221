@@ -1,84 +1,174 @@
 <!DOCTYPE html>
 <html lang="th">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>PTT ERP - Report Module</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css"
-        />
-        
-    </head>
-    <body>
-        <div class="sidebar">
-            <h2> PTT ERP</h2>
-            <nav>
-                <a href="index.html">Home</a>
-                <a href="financials.html">Financials</a>
-                <a href="procurement.html">Inventory</a>
-                <a href="report.html">Report</a>
-            </nav>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PTT ERP - Report Module</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      display: flex; min-height: 100vh;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+    }
 
-        <div class="main">
-            <div class="header">
-                <h1>รายงาน (Report)</h1>
-                <button>Export CSV</button>
-            </div>
+    /* Sidebar */
+    .sidebar {
+      width: 240px; background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px); padding: 20px;
+      display: flex; flex-direction: column; gap: 20px;
+      box-shadow: 2px 0 15px rgba(0,0,0,0.3);
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+    .sidebar h2 {
+      font-size: 1.3rem; text-align: center; font-weight: 600;
+    }
+    .sidebar nav {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .sidebar nav a {
+      text-decoration: none; padding: 12px 15px;
+      border-radius: 12px; font-weight: 500;
+      color: #fff; transition: 0.3s;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      background: rgba(255,255,255,0.3); color: #000; font-weight: 600;
+    }
 
-            <div class="filters">
-                <label for="report-type">Report Type:</label>
-                <select id="report-type" name="report-type">
-                    <option value="purchase">Purchase Report</option>
-                    <option value="inventory">Inventory Report</option>
-                    <option value="finance">Financial Report</option>
-                </select>
+    /* Main */
+    .main { flex: 1; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 1.6rem; text-shadow: 2px 2px 5px rgba(0,0,0,0.4); }
 
-                <label for="from-date">From:</label>
-                <input type="date" id="from-date" name="from-date" />
+    .btn {
+      background: #ffd369; color: #000; padding: 10px 18px;
+      border-radius: 12px; font-weight: 600; text-decoration: none;
+      transition: 0.3s;
+    }
+    .btn:hover { background: #ffb703; }
 
-                <label for="to-date">To:</label>
-                <input type="date" id="to-date" name="to-date" />
+    /* Filters */
+    .filters {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.15);
+      padding: 15px; border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      flex-wrap: wrap;
+    }
+    .filters label {
+      font-size: 0.9rem; font-weight: 500;
+    }
+    .filters input, .filters select {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .filters button {
+      background: #16a34a; color: #fff;
+      border: none; padding: 8px 14px;
+      border-radius: 10px; cursor: pointer;
+      transition: 0.3s;
+    }
+    .filters button:hover { background: #15803d; }
 
-                <button>Filter</button>
-            </div>
+    /* Table */
+    .table-section {
+      background: rgba(255,255,255,0.12);
+      padding: 20px; border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .table-section h2 { margin-bottom: 15px; }
+    table {
+      width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden;
+    }
+    table thead { background: rgba(255,255,255,0.2); }
+    table th, table td {
+      padding: 12px 15px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    table tbody tr:hover { background: rgba(255,255,255,0.1); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>PTT ERP</h2>
+    <nav>
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="financials.html"><i class="fa-solid fa-coins"></i> Financials</a>
+      <a href="procurement.html"><i class="fa-solid fa-box"></i> Inventory</a>
+      <a href="report.html" class="active"><i class="fa-solid fa-chart-line"></i> Report</a>
+    </nav>
+  </aside>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Report ID</th>
-                        <th>Title</th>
-                        <th>Created By</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>RPT-001</td>
-                        <td>Monthly Purchase Summary</td>
-                        <td>Somchai P.</td>
-                        <td>01/07/2025</td>
-                        <td>Completed</td>
-                    </tr>
-                    <tr>
-                        <td>RPT-002</td>
-                        <td>Inventory Check July</td>
-                        <td>Jintana W.</td>
-                        <td>10/07/2025</td>
-                        <td>In Progress</td>
-                    </tr>
-                    <tr>
-                        <td>RPT-003</td>
-                        <td>Quarterly Financial Overview</td>
-                        <td>Wichai S.</td>
-                        <td>15/07/2025</td>
-                        <td>Pending</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </body>
+  <div class="main">
+    <div class="header">
+      <h1>รายงาน (Report)</h1>
+      <a href="#" class="btn"><i class="fa-solid fa-file-export"></i> Export CSV</a>
+    </div>
 
-    <script src="./scripts/script.js"></script>
+    <div class="filters">
+      <label for="report-type">Report Type:</label>
+      <select id="report-type" name="report-type">
+        <option value="purchase">Purchase Report</option>
+        <option value="inventory">Inventory Report</option>
+        <option value="finance">Financial Report</option>
+      </select>
+
+      <label for="from-date">From:</label>
+      <input type="date" id="from-date" name="from-date" />
+
+      <label for="to-date">To:</label>
+      <input type="date" id="to-date" name="to-date" />
+
+      <button>Filter</button>
+    </div>
+
+    <div class="table-section">
+      <h2><i class="fa-solid fa-table"></i> ข้อมูลรายงาน</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Report ID</th>
+            <th>Title</th>
+            <th>Created By</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>RPT-001</td>
+            <td>Monthly Purchase Summary</td>
+            <td>Somchai P.</td>
+            <td>01/07/2025</td>
+            <td><span class="status ok">Completed</span></td>
+          </tr>
+          <tr>
+            <td>RPT-002</td>
+            <td>Inventory Check July</td>
+            <td>Jintana W.</td>
+            <td>10/07/2025</td>
+            <td><span class="status pending">In Progress</span></td>
+          </tr>
+          <tr>
+            <td>RPT-003</td>
+            <td>Quarterly Financial Overview</td>
+            <td>Wichai S.</td>
+            <td>15/07/2025</td>
+            <td><span class="status warn">Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
 </html>
